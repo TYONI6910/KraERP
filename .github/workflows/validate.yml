@@ -1,0 +1,34 @@
+name: Validate KARA package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check required files
+        run: |
+          test -f login.html
+          test -f index.html
+          test -f config/supabase-config.js
+          test -f assets/auth-guard.js
+          echo "KARA package structure OK"
+
+      - name: Check forbidden service role key
+        run: |
+          if grep -R "service_role" -n . --exclude-dir=.git --exclude-dir=.github; then
+            echo "ERREUR: service_role detecte dans le depot"
+            exit 1
+          fi
+          echo "No service_role keyword found"
