@@ -1,15 +1,218 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KARA Portuaire</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config/supabase-config.js"></script><script src="assets/auth-guard.js"></script><link rel="stylesheet" href="assets/office.css"></head><body><header class="top"><strong>KARA Portuaire</strong><input class="search" placeholder="Rechercher : client, dossier, conteneur, facture..."><button class="btn secondary" onclick="kraLogout()">Déconnexion</button></header><div class="layout"><aside class="nav"><div class="item active" data-m="accueil">▣ Accueil</div><div class="item" data-m="clients">👥 Clients / Tiers</div><div class="item" data-m="groupage">▦ Groupage</div><div class="item" data-m="dossiers">📁 Dossiers</div><div class="item" data-m="marchandises">📦 Marchandises</div><div class="item" data-m="conteneurs">▤ Conteneurs</div><div class="item" data-m="tarifs">€ Tarifs</div><div class="item" data-m="finance">📊 Finance</div><div class="item" data-m="admin">⚙ Administration</div></aside><main class="main">
-<section id="accueil" class="module active"><h1>Accueil</h1><div class="grid"><div class="card">Dossiers<div class="kpi">0</div></div><div class="card">Groupages<div class="kpi">0</div></div><div class="card">Clients<div class="kpi">0</div></div><div class="card">Alertes<div class="kpi">0</div></div></div><div class="panel">Interface Office minimale opérationnelle.</div></section>
-<section id="clients" class="module"><h1>Clients / Tiers</h1><div class="panel">Module prêt à brancher Supabase.</div></section>
-<section id="groupage" class="module"><h1>Groupage</h1><div class="panel">Module prêt à brancher Supabase.</div></section>
-<section id="dossiers" class="module"><h1>Dossiers</h1><div class="panel">Module prêt à brancher Supabase.</div></section>
-<section id="marchandises" class="module"><h1>Marchandises</h1><div class="panel">Module prêt à brancher Supabase.</div></section>
-<section id="conteneurs" class="module"><h1>Conteneurs</h1><div class="panel">Module prêt à brancher Supabase.</div></section>
-<section id="tarifs" class="module"><h1>Tarifs</h1><div class="panel">Calculateur KARA à brancher.</div></section>
-<section id="finance" class="module"><h1>Finance</h1><div class="panel">Devis, factures, paiements à brancher.</div></section>
-<section id="admin" class="module"><h1>Administration</h1><div class="panel">Utilisateurs et sécurité.</div></section>
-</main></div><script>
-document.querySelectorAll('.item').forEach(i=>i.onclick=()=>{document.querySelectorAll('.item').forEach(x=>x.classList.remove('active'));i.classList.add('active');document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));document.getElementById(i.dataset.m).classList.add('active')})
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KARA Portuaire - Office V2.0.121</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config/supabase-config.js"></script>
+<script src="assets/auth-guard.js"></script>
+<link rel="stylesheet" href="assets/office.css">
+</head>
+<body>
 
-</script></body></html>
+<header class="top">
+  <div class="waffle" id="waffle" title="Menu">▦</div>
+  <div class="title">KARA Portuaire</div>
+  <input class="search" id="globalSearch" placeholder="Rechercher dans KARA : client, dossier, conteneur, facture...">
+  <div class="top-actions">
+    <button class="top-btn" onclick="alert('KARA V2.0.121 — Office Interface\\nDocumentation à venir')">Aide</button>
+    <button class="top-btn" onclick="kraLogout()">Déconnexion</button>
+    <div class="user" id="userBadge" title="Utilisateur connecté">K</div>
+  </div>
+</header>
 
+<div class="layout">
+  <aside class="nav" id="nav">
+    <div class="nav-head">Modules</div>
+    <div class="item active" data-module="dashboard"><span>▣</span>Accueil</div>
+    <div class="item" data-module="clients"><span>👥</span>Clients / Tiers</div>
+    <div class="item" data-module="groupage"><span>▦</span>Groupage</div>
+    <div class="item" data-module="dossiers"><span>📁</span>Dossiers</div>
+    <div class="item" data-module="marchandises"><span>📦</span>Marchandises</div>
+    <div class="item" data-module="conteneurs"><span>▤</span>Conteneurs</div>
+    <div class="item" data-module="tarifs"><span>€</span>Tarifs / Catalogue</div>
+    <div class="item" data-module="finance"><span>📊</span>Finance</div>
+    <div class="item" data-module="ged"><span>📎</span>GED</div>
+    <div class="item" data-module="admin"><span>⚙</span>Administration</div>
+  </aside>
+
+  <main class="main">
+    <div class="cmdbar">
+      <button class="cmd primary" id="cmdNew">+ Nouveau</button>
+      <button class="cmd" id="cmdReload">↻ Actualiser</button>
+      <button class="cmd" onclick="kra.toast('Export à venir dans la prochaine version','info')">Exporter CSV</button>
+      <span class="muted" id="moduleBreadcrumb" style="margin-left:auto">Accueil</span>
+    </div>
+
+    <div class="content">
+
+      <!-- ===== DASHBOARD ===== -->
+      <section id="dashboard" class="module active">
+        <div class="titlebar">
+          <div>
+            <h1>Accueil</h1>
+            <p>Vue d'ensemble de l'activité — données en direct depuis Supabase.</p>
+          </div>
+          <span class="tag info">V2.0.121 Office</span>
+        </div>
+        <div class="grid">
+          <div class="card"><div class="label">Dossiers ouverts</div><div class="kpi loading" id="kpi-dossiers">…</div><span class="tag">transport_files</span></div>
+          <div class="card"><div class="label">Lignes de groupage</div><div class="kpi loading" id="kpi-groupages">…</div><span class="tag">groupage_file_lines</span></div>
+          <div class="card"><div class="label">Tiers actifs</div><div class="kpi loading" id="kpi-clients">…</div><span class="tag">parties</span></div>
+          <div class="card"><div class="label">Factures non soldées</div><div class="kpi loading" id="kpi-factures">…</div><span class="tag warn">invoices</span></div>
+        </div>
+        <div class="split" style="margin-top:16px">
+          <div class="panel">
+            <h2>Dossiers récents</h2>
+            <div class="table-wrap" style="max-height:360px">
+              <table>
+                <thead><tr><th>Dossier</th><th>Module</th><th>Statut</th></tr></thead>
+                <tbody id="recent-rows"><tr><td colspan="3" class="muted">Chargement...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <h2>État de l'application</h2>
+            <div class="task"><strong>Connexion Supabase</strong><div class="muted" id="sb-status">Vérification...</div></div>
+            <div class="task"><strong>Société</strong><div class="muted" id="company-info">—</div></div>
+            <div class="task"><strong>Utilisateur</strong><div class="muted" id="user-info">—</div></div>
+            <div class="task"><strong>Version</strong><div class="muted">V2.0.121 Office Interface — branchement Supabase actif</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== MODULES CRUD ===== -->
+      <section id="clients" class="module">
+        <div class="titlebar"><div><h1>Clients / Tiers</h1><p>Fiche client, transitaires, fournisseurs, chargeurs, groupeurs.</p></div><span class="tag info">parties</span></div>
+        <div data-role="container"></div>
+      </section>
+
+      <section id="groupage" class="module">
+        <div class="titlebar"><div><h1>Groupage</h1><p>Lignes de groupage : sous-clients, PDS, DSC.</p></div><span class="tag info">groupage_file_lines</span></div>
+        <div data-role="container"></div>
+      </section>
+
+      <section id="dossiers" class="module">
+        <div class="titlebar"><div><h1>Dossiers</h1><p>Dossiers transport / transit / déclaration.</p></div><span class="tag info">transport_files</span></div>
+        <div data-role="container"></div>
+      </section>
+
+      <section id="marchandises" class="module">
+        <div class="titlebar"><div><h1>Marchandises</h1><p>Articles, codes SH, poids, valeur FOB, fret, assurance.</p></div><span class="tag info">cargo_items</span></div>
+        <div data-role="container"></div>
+      </section>
+
+      <section id="conteneurs" class="module">
+        <div class="titlebar"><div><h1>Conteneurs</h1><p>Conteneurs, transporteur, chauffeur, BL, lieu de livraison.</p></div><span class="tag info">containers</span></div>
+        <div data-role="container"></div>
+      </section>
+
+      <section id="tarifs" class="module">
+        <div class="titlebar"><div><h1>Tarifs / Catalogue</h1><p>Catalogue tarifaire fournisseurs.</p></div><span class="tag info">supplier_tariff_catalog</span></div>
+        <div data-role="container"></div>
+      </section>
+
+      <section id="finance" class="module">
+        <div class="titlebar"><div><h1>Finance</h1><p>Factures, totaux HT/TTC, paiements, soldes.</p></div><span class="tag info">invoices</span></div>
+        <div data-role="container"></div>
+      </section>
+
+      <section id="ged" class="module">
+        <div class="titlebar"><div><h1>GED</h1><p>Documents légaux, BL, factures, déclarations.</p></div><span class="tag info">production_document_files</span></div>
+        <div data-role="container"></div>
+      </section>
+
+      <section id="admin" class="module">
+        <div class="titlebar"><div><h1>Administration</h1><p>Utilisateurs et rôles applicatifs.</p></div><span class="tag info">app_users</span></div>
+        <div data-role="container"></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="modules/dashboard.js"></script>
+<script src="modules/clients.js"></script>
+<script src="modules/groupage.js"></script>
+<script src="modules/dossiers.js"></script>
+<script src="modules/marchandises.js"></script>
+<script src="modules/conteneurs.js"></script>
+<script src="modules/tarifs.js"></script>
+<script src="modules/finance.js"></script>
+<script src="modules/ged.js"></script>
+<script src="modules/admin.js"></script>
+
+<script>
+// ====== Navigation entre modules ======
+const moduleLabels = {
+  dashboard:'Accueil', clients:'Clients / Tiers', groupage:'Groupage', dossiers:'Dossiers',
+  marchandises:'Marchandises', conteneurs:'Conteneurs', tarifs:'Tarifs / Catalogue',
+  finance:'Finance', ged:'GED', admin:'Administration'
+};
+let currentModule = 'dashboard';
+
+document.querySelectorAll('.item').forEach(i => i.onclick = () => switchModule(i.dataset.module));
+
+function switchModule(id){
+  if(!id) return;
+  currentModule = id;
+  document.querySelectorAll('.item').forEach(x => x.classList.toggle('active', x.dataset.module === id));
+  document.querySelectorAll('.module').forEach(m => m.classList.toggle('active', m.id === id));
+  document.getElementById('moduleBreadcrumb').textContent = moduleLabels[id] || id;
+  // Active le module si c'est un module CRUD
+  if(id === 'dashboard'){
+    window.kraDashboard.refresh();
+  } else if(window.kra && window.kra.activateModule){
+    window.kra.activateModule(id);
+  }
+}
+
+// Boutons de la commande bar
+document.getElementById('cmdNew').onclick = () => {
+  if(currentModule === 'dashboard'){
+    kra.toast('Sélectionnez un module pour créer un nouvel élément','info');
+    return;
+  }
+  kra.openForm(currentModule, null);
+};
+document.getElementById('cmdReload').onclick = () => {
+  if(currentModule === 'dashboard') window.kraDashboard.refresh();
+  else if(window.kra && window.kra.activateModule) window.kra.activateModule(currentModule);
+};
+
+// Recherche globale (filtre simple : redirige vers le module et y injecte la recherche)
+const globalSearch = document.getElementById('globalSearch');
+let gsTimer;
+globalSearch.addEventListener('input', () => {
+  clearTimeout(gsTimer);
+  gsTimer = setTimeout(() => {
+    const q = globalSearch.value.trim();
+    if(!q || currentModule === 'dashboard') return;
+    const root = document.getElementById(currentModule);
+    const localSearch = root.querySelector('[data-role="search"]');
+    if(localSearch){ localSearch.value = q; localSearch.dispatchEvent(new Event('input')); }
+  }, 300);
+});
+
+// Mobile menu
+document.getElementById('waffle').onclick = () => {
+  document.getElementById('nav').classList.toggle('mobile-open');
+};
+
+// ====== Auth ready hook ======
+window.addEventListener('kra-auth-ready', async (e) => {
+  const session = e.detail.session;
+  const email = (session.user && session.user.email) || 'K';
+  document.getElementById('userBadge').textContent = email[0].toUpperCase();
+  document.getElementById('user-info').textContent = email;
+  document.getElementById('sb-status').innerHTML = '<span class="ok">✓ Session active</span>';
+  document.getElementById('company-info').textContent = window.KRA_SUPABASE.companyId || '—';
+
+  // Premier chargement du dashboard
+  setTimeout(() => window.kraDashboard.refresh(), 100);
+});
+</script>
+</body>
+</html>

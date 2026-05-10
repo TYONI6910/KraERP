@@ -1,7 +1,76 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KARA - Connexion</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config/supabase-config.js"></script><link rel="stylesheet" href="assets/office.css"></head><body class="login"><main class="loginbox"><section class="brand"><h1>KARA Portuaire</h1><p>Interface Office / Outlook. Connexion sécurisée Supabase.</p></section><section class="form"><h2>Connexion</h2><p>Entrez vos identifiants utilisateur.</p><form id="f"><label>Email</label><input class="input" id="email" type="email" required><br><br><label>Mot de passe</label><input class="input" id="password" type="password" required><br><br><button class="btn" id="login">Se connecter</button> <button class="btn secondary" id="reset" type="button">Mot de passe oublié</button></form><div id="st" class="status"></div></section></main><script>
-const sb=window.supabase.createClient(window.KRA_SUPABASE.url,window.KRA_SUPABASE.publishableKey),st=document.getElementById('st');
-function msg(c,t){st.className='status '+c;st.textContent=t}
-(async()=>{const {data}=await sb.auth.getSession();if(data.session)location.href='index.html'})()
-f.onsubmit=async e=>{e.preventDefault();login.disabled=true;login.textContent='Connexion...';const email=document.getElementById('email').value.trim().toLowerCase(),password=document.getElementById('password').value;const {error}=await sb.auth.signInWithPassword({email,password});if(error){msg('err',error.message);login.disabled=false;login.textContent='Se connecter';return}msg('ok','Connexion acceptée');setTimeout(()=>location.href='index.html',400)}
-reset.onclick=async()=>{const email=document.getElementById('email').value.trim().toLowerCase();if(!email){msg('err','Renseigner email');return}const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/login.html'});msg(error?'err':'ok',error?error.message:'Email envoyé si le compte existe')}
-</script></body></html>
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KARA - Connexion</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config/supabase-config.js"></script>
+<link rel="stylesheet" href="assets/office.css">
+</head>
+<body class="login">
+<main class="loginbox">
+  <section class="brand">
+    <h1>KARA Portuaire</h1>
+    <p>Interface Office / Outlook. Connexion sécurisée Supabase pour les modules clients, dossiers, groupage, conteneurs, tarifs, finance, GED et administration.</p>
+    <p>Branchement Supabase actif sur tous les modules : listes paginées, recherche, création, édition.</p>
+    <div class="ver">Version V2.0.121 — Office Interface</div>
+  </section>
+  <section class="form">
+    <h2>Connexion</h2>
+    <p>Entrez vos identifiants utilisateur.</p>
+    <form id="f" autocomplete="on">
+      <div class="field">
+        <label>Email</label>
+        <input class="input" id="email" type="email" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input class="input" id="password" type="password" autocomplete="current-password" required>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="login">Se connecter</button>
+        <button class="btn secondary" id="reset" type="button">Mot de passe oublié</button>
+      </div>
+    </form>
+    <div id="st" class="status"></div>
+  </section>
+</main>
+
+<script>
+const sb = window.supabase.createClient(window.KRA_SUPABASE.url, window.KRA_SUPABASE.publishableKey);
+const st = document.getElementById('st');
+function msg(c, t){ st.className = 'status ' + c; st.textContent = t; }
+
+// Déjà connecté ?
+(async () => {
+  const {data} = await sb.auth.getSession();
+  if(data.session) location.href = 'index.html';
+})();
+
+document.getElementById('f').onsubmit = async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('login');
+  btn.disabled = true; btn.textContent = 'Connexion...';
+  msg('info', 'Authentification en cours...');
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  const password = document.getElementById('password').value;
+  const {error} = await sb.auth.signInWithPassword({email, password});
+  if(error){
+    msg('err', error.message);
+    btn.disabled = false; btn.textContent = 'Se connecter';
+    return;
+  }
+  msg('ok', 'Connexion acceptée — redirection...');
+  setTimeout(() => location.href = 'index.html', 400);
+};
+
+document.getElementById('reset').onclick = async () => {
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  if(!email){ msg('err', 'Renseignez votre email puis cliquez sur "Mot de passe oublié"'); return; }
+  const {error} = await sb.auth.resetPasswordForEmail(email, {redirectTo: location.origin + '/login.html'});
+  msg(error ? 'err' : 'ok', error ? error.message : 'Email de réinitialisation envoyé si le compte existe');
+};
+</script>
+</body>
+</html>

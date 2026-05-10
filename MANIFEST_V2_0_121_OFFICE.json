@@ -1,0 +1,36 @@
+{
+  "version": "V2.0.121",
+  "theme": "Office/Outlook",
+  "entrypoint": "login.html",
+  "app": "index.html",
+  "status": "supabase-connected",
+  "modules_connected": {
+    "dashboard": "compteurs réels (transport_files, groupage_file_lines, parties, invoices)",
+    "clients": "parties (CRUD)",
+    "groupage": "groupage_file_lines (CRUD)",
+    "dossiers": "transport_files (CRUD)",
+    "marchandises": "cargo_items (CRUD)",
+    "conteneurs": "containers (CRUD)",
+    "tarifs": "supplier_tariff_catalog (CRUD)",
+    "finance": "invoices (CRUD)",
+    "ged": "production_document_files (CRUD)",
+    "admin": "app_users (CRUD)"
+  },
+  "features": [
+    "Listes paginées Supabase (25 ou 50 par page)",
+    "Recherche multi-colonnes (ilike)",
+    "Tri par updated_at descendant",
+    "Drawer formulaire (création / modification)",
+    "Suppression avec confirmation",
+    "Toasts de feedback (succès, erreur, info)",
+    "Tableau de bord avec compteurs en direct",
+    "Recherche globale qui filtre le module actif",
+    "Responsive mobile (menu hamburger)"
+  ],
+  "supabase": {
+    "url": "https://rpserwubjbuihefflccq.supabase.co",
+    "projectId": "rpserwubjbuihefflccq",
+    "companyId": "TRY6910",
+    "publishableKey_set": true
+  }
+}
